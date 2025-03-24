@@ -12,6 +12,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -22,8 +23,23 @@ app.use(helmet({
 }));
 
 // Configure CORS
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  'http://localhost:3000',
+  'https://proserso.vercel.app',
+  'https://proserso.com'
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('CORS not allowed'));
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
 
@@ -91,6 +107,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

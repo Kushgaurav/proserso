@@ -47,3 +47,5 @@ pids
 *.swp
 *.swo
 *~
+/node_modules
+

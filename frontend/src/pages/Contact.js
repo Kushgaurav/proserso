@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import contactHeaderImg from '../assets/images/contact-header.jpg';
+import { sendContactForm } from '../services/contactService';
 import '../styles/Contact.css';
 
 function Contact() {
@@ -12,6 +13,11 @@ function Contact() {
     subject: '',
     message: ''
   });
+  const [submitStatus, setSubmitStatus] = useState({
+    submitting: false,
+    success: false,
+    error: null
+  });
 
   const handleChange = (e) => {
     setFormData({
@@ -20,10 +26,39 @@ function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Form submission logic would go here
-    console.log('Form submitted:', formData);
+    
+    try {
+      setSubmitStatus({ submitting: true, success: false, error: null });
+      
+      // Send the form data using our contact service
+      await sendContactForm(formData);
+      
+      // If successful, update state and reset form
+      setSubmitStatus({ submitting: false, success: true, error: null });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        subject: '',
+        message: ''
+      });
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(prev => ({ ...prev, success: false }));
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus({ 
+        submitting: false, 
+        success: false, 
+        error: 'There was a problem sending your message. Please try again later.'
+      });
+    }
   };
 
   return (
@@ -74,6 +109,20 @@ function Contact() {
               <h2>Send Us a Message</h2>
               <p>Fill out the form below and we'll get back to you shortly</p>
             </div>
+            
+            {submitStatus.success && (
+              <div className="success-message">
+                <i className="fas fa-check-circle"></i>
+                <p>Your message has been sent successfully! We'll get back to you soon.</p>
+              </div>
+            )}
+            
+            {submitStatus.error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i>
+                <p>{submitStatus.error}</p>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
@@ -148,9 +197,16 @@ function Contact() {
                 </div>
                 
                 <div className="form-group full-width">
-                  <button type="submit" className="submit-button">
-                    Send Message
-                    <i className="fas fa-paper-plane"></i>
+                  <button 
+                    type="submit" 
+                    className="submit-button"
+                    disabled={submitStatus.submitting}
+                  >
+                    {submitStatus.submitting ? (
+                      <>Sending... <i className="fas fa-spinner fa-spin"></i></>
+                    ) : (
+                      <>Send Message <i className="fas fa-paper-plane"></i></>
+                    )}
                   </button>
                 </div>
               </div>

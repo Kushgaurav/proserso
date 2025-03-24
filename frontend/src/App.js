@@ -2,6 +2,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
+import emailjs from 'emailjs-com';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
@@ -32,6 +33,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import FlashMessage from './components/FlashMessage';
 import { AuthProvider } from './context/AuthContext';
 import AdminUsers from './components/AdminUsers';
+
+// Initialize EmailJS with the public key
+emailjs.init("vosgvbb9yvhPXNTlG");
 
 function AppContent() {
   const [flashMessage, setFlashMessage] = useState(null);

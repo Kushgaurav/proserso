@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: proserso-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        value: mongodb+srv://user11:5tv466exBgp5Y6Ox@proserso.ruejv.mongodb.net/?retryWrites=true&w=majority&appName=proserso
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://proserso.vercel.app
